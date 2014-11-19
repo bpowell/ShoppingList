@@ -8,6 +8,7 @@ public class ShoppingItem {
     private String itemName;
     private int imageId;
     private boolean purchased;
+    private String itemComment;
 
     public String getItemName() {
         return itemName;
@@ -33,7 +34,13 @@ public class ShoppingItem {
         this.purchased = purchased;
     }
 
+    public String getItemComment() {
+        return itemComment;
+    }
 
+    public void setItemComment(String itemComment) {
+        this.itemComment = itemComment;
+    }
 
 
 
