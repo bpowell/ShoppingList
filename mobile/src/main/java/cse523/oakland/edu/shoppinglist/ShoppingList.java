@@ -33,4 +33,16 @@ public class ShoppingList {
     public void setId(int id) {
         this.id = id;
     }
+
+    public void addItem(ShoppingItem item) {
+        this.items.add(item);
+    }
+
+    public void removeItem(ShoppingItem item) {
+        this.items.remove(item);
+    }
+
+    public void removeItem(int i) {
+        this.items.remove(i);
+    }
 }
