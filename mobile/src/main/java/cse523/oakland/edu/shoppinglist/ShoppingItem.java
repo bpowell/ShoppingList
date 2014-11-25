@@ -7,7 +7,7 @@ public class ShoppingItem {
 
     private String itemName;
     private int imageId;
-    private boolean purchased;
+    private int purchased;
 
     public String getItemName() {
         return itemName;
@@ -25,11 +25,11 @@ public class ShoppingItem {
         this.imageId = imageId;
     }
 
-    public boolean isPurchased() {
+    public int isPurchased() {
         return purchased;
     }
 
-    public void setPurchased(boolean purchased) {
+    public void setPurchased(int purchased) {
         this.purchased = purchased;
     }
 
