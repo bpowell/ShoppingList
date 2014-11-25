@@ -10,6 +10,10 @@ public class ShoppingList {
     private String name;
     private ArrayList<ShoppingItem> items;
 
+    public ShoppingList() {
+        items = new ArrayList<ShoppingItem>();
+    }
+
     public ArrayList<ShoppingItem> getItems() {
         return items;
     }
