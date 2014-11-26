@@ -1,12 +1,21 @@
 package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.logging.Logger;
 
@@ -16,6 +25,8 @@ public class Main extends Activity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +74,78 @@ public class Main extends Activity {
         ds.close();
         Log.d("========", b.getName());
         //end test code
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new ConnectionCallbacks())
+                .addOnConnectionFailedListener(new ConnectionFailedListener())
+                .addApi(Wearable.API)
+                .build();
     }
 
+    //start for sync
+    private static class SendDataTask extends AsyncTask<Object, Void, Void> {
+        private static final String TAG = "MessageUtils.SendDataTask";
+        private static final String ASSET_KEY = "data";
 
+        protected Void doInBackground(Object... params) {
+            GoogleApiClient client = (GoogleApiClient)params[0];
+
+            PutDataMapRequest dataMap = PutDataMapRequest.create((String)params[1]);
+            dataMap.getDataMap().putAsset(ASSET_KEY, (Asset)params[2]);
+            PutDataRequest request = dataMap.asPutDataRequest();
+            DataApi.DataItemResult result = Wearable.DataApi
+                    .putDataItem(client, request)
+                    .await();
+            if (!result.getStatus().isSuccess()) {
+                Log.e(TAG, "could not send data (" + result.getStatus() + ")");
+            }
+
+            return null;
+        }
+    }
+
+    public static void sendData(GoogleApiClient client, String path, Asset asset) {
+        new SendDataTask().execute(client, path, asset);
+    }
+
+    private class ConnectionCallbacks implements
+            GoogleApiClient.ConnectionCallbacks {
+        @Override
+        public void onConnected(Bundle bundle) {
+            // empty
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            // empty
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (null != mGoogleApiClient && !mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    private class ConnectionFailedListener implements
+            GoogleApiClient.OnConnectionFailedListener {
+        @Override
+        public void onConnectionFailed(ConnectionResult result) {
+            // empty
+        }
+    }
+    //end for sync
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
