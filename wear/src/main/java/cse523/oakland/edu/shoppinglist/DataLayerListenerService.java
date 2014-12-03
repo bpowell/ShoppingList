@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DataLayerListenerService extends WearableListenerService {
     private static final String TAG = "WEARTHEREHERE";
+    public static final String START_ACTIVITY_PATH = "/start-activity";
 
     GoogleApiClient mGoogleApiClient;
 
@@ -38,7 +39,7 @@ public class DataLayerListenerService extends WearableListenerService {
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.d(TAG, "onDataChanged in listserv: " + dataEvents);
+        Log.d(TAG, "onDataChanged : " + dataEvents);
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
         dataEvents.close();
         if(!mGoogleApiClient.isConnected()) {
@@ -48,37 +49,21 @@ public class DataLayerListenerService extends WearableListenerService {
                 Log.e(TAG, "DataLayerListenerService failed to connect to GoogleApiClient.");
                 return;
             }else{
-                Log.d(TAG, "WE CONNECTED TO GOOGLEAPI CLIENT");
+                Log.d(TAG, "we connected");
             }
         }else{
-            Log.d(TAG, "we not connected yo");
-        }
-
-        // Loop through the events and send a message back to the node that created the data item.
-        //for (DataEvent event : events) {
-        //}
-        for (DataEvent event : events) {
-            DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-            Log.d(TAG, dataMapItem.getDataMap().getString("listname"));
-            Uri uri = event.getDataItem().getUri();
-            String path = uri.getPath();
-            // Get the node id of the node that created the data item from the host portion of
-            // the uri.
-            String nodeId = uri.getHost();
-            // Set the data of the message to be the bytes of the Uri.
-            byte[] payload = uri.toString().getBytes();
-
-            // Send the rpc
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, "/ret", payload);
+            Log.d(TAG, "we not connected");
         }
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "onMessageReceived: " + messageEvent);
-        Intent startIntent = new Intent(this, MainWear.class);
-        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startIntent);
+        if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
+            Intent startIntent = new Intent(this, MainWear.class);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startIntent);
+        }
     }
 
     @Override

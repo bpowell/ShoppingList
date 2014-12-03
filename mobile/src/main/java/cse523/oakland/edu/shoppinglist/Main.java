@@ -44,6 +44,7 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
     private RecyclerView.LayoutManager mLayoutManager;
     public static final String TAG = "=====";
     public static final String PATH = "/shop";
+    public static final String START_ACTIVITY_PATH = "/start-activity";
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -101,13 +102,11 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
                 .addApi(Wearable.API)
                 .build();
 
-        Button btn = (Button) findViewById(R.id.open);
-        btn.setOnClickListener(new View.OnClickListener() {
+        Button btn_open_wear_activity = (Button) findViewById(R.id.open);
+        btn_open_wear_activity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "btn push", Toast.LENGTH_LONG).show();
-                String text = "hello wordl";
-                sendMessage("/test", text);
+                sendMessage(START_ACTIVITY_PATH, "null");
             }
         });
 
