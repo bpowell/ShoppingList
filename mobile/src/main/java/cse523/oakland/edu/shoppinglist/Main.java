@@ -5,10 +5,13 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.logging.Logger;
 
 
 public class Main extends Activity {
@@ -50,7 +53,6 @@ public class Main extends Activity {
         mAdapter = new MyAdapter(myDataset);
         mRecyclerView.setAdapter(mAdapter);
 
-
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +60,24 @@ public class Main extends Activity {
                 newItemDialog.show(fm, "WOW");
             }
         });
+
+        //start test code
+        ShoppingList a = new ShoppingList();
+        a.setName("list1");
+        ShoppingItem i1 = new ShoppingItem();
+        i1.setPurchased(0);
+        i1.setImageId(1000);
+        i1.setItemName("apples");
+        a.addItem(i1);
+
+        ShoppingDataSource ds = new ShoppingDataSource(this);
+        ds.open();
+        ds.addShoppingList(a);
+
+        ShoppingList b = ds.getShoppingList();
+        ds.close();
+        Log.d("========", b.getName());
+        //end test code
     }
 
 
