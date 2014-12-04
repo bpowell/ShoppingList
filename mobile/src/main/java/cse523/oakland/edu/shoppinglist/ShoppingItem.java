@@ -8,7 +8,7 @@ public class ShoppingItem {
     private String itemName;
     private int imageId;
     private String itemComment;
-    private int purchased;
+    private int purchased = 0;
 
     public String getItemName() {
         return itemName;

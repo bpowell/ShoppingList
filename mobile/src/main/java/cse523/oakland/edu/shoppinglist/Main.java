@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 
@@ -30,28 +31,28 @@ public class Main extends Activity {
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         addItemButton = (Button) findViewById(R.id.addItem);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        String[] myDataset = new String[10];
-        myDataset[0] = "wow";
-        myDataset[1] = "wow";
-        myDataset[2] = "wow";
-        myDataset[3] = "wow";
-        myDataset[4] = "wow";
-        myDataset[5] = "wow";
-        myDataset[6] = "wow";
-        myDataset[7] = "wow";
-        myDataset[8] = "wow";
-        myDataset[9] = "wow";
+        ShoppingList shoppingList = ShoppingList.getAppData();
 
-        mAdapter = new MyAdapter(myDataset);
+        ShoppingItem test = new ShoppingItem();
+        test.setItemName("Banana");
+        test.setImageId(R.drawable.img_produce_nt);
+        test.setPurchased(1);
+        shoppingList.addItem(test);
+
+        ShoppingItem test2 = new ShoppingItem();
+        test2.setItemName("Steak");
+        test2.setImageId(R.drawable.img_meat_nt);
+        shoppingList.addItem(test2);
+
+        mAdapter = new MyAdapter(shoppingList.getItems());
         mRecyclerView.setAdapter(mAdapter);
+
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,27 +61,7 @@ public class Main extends Activity {
                 newItemDialog.show(fm, "WOW");
             }
         });
-
-        //start test code
-        ShoppingList a = new ShoppingList();
-        a.setName("list1");
-        ShoppingItem i1 = new ShoppingItem();
-        i1.setPurchased(0);
-        i1.setImageId(1000);
-        i1.setItemName("apples");
-        a.addItem(i1);
-
-        ShoppingDataSource ds = new ShoppingDataSource(this);
-        ds.open();
-        ds.addShoppingList(a);
-
-        ShoppingList b = ds.getShoppingList();
-        ds.close();
-        Log.d("========", b.getName());
-        //end test code
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -102,5 +83,14 @@ public class Main extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    public void onShoppingListUpdate() {
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -9,9 +9,17 @@ public class ShoppingList {
     private int id;
     private String name;
     private ArrayList<ShoppingItem> items;
+    private static ShoppingList _shoppingList = null;
+
 
     public ShoppingList() {
         items = new ArrayList<ShoppingItem>();
+    }
+
+    public static ShoppingList getAppData() {
+        if(_shoppingList == null)
+            _shoppingList = new ShoppingList();
+        return _shoppingList;
     }
 
     public ArrayList<ShoppingItem> getItems() {
