@@ -40,6 +40,8 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import android.view.View.OnApplyWindowInsetsListener;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -90,12 +92,15 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
                 .addOnConnectionFailedListener(this)
                 .build();
 
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
+        sendMessage("/givemedata", "null");
     }
 
     @Override
@@ -196,5 +201,29 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
             // Do something with spokenText
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private Collection<String> getNodes() {
+        HashSet<String> results = new HashSet<String>();
+        NodeApi.GetConnectedNodesResult nodes =
+                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+        for (Node node : nodes.getNodes()) {
+            results.add(node.getId());
+        }
+        return results;
+    }
+
+    private void sendMessage( final String path, final String text ) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                for (Node node : nodes.getNodes()) {
+                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+                            mGoogleApiClient, node.getId(), path, text.getBytes()).await();
+                    Log.d(TAG, "did we " + result.getStatus().getStatusMessage());
+                }
+            }
+        }).start();
     }
 }

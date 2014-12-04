@@ -2,6 +2,7 @@ package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -196,6 +197,10 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "MSG REC" + messageEvent);
         Toast.makeText(this, "WE GOT A MSG!!" + messageEvent, Toast.LENGTH_LONG).show();
+
+        if (messageEvent.getPath().equals("/givemedata")) {
+            sendData("/data", shoppingList);
+        }
     }
 
     @Override
