@@ -6,45 +6,68 @@ import android.content.Context;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.ImageReference;
+import android.util.Log;
 import android.view.Gravity;
 
 public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private final Context mContext;
+    public static final String TAG = "WEARTHEREHERE";
     public ShoppingList shoppingList;
 
-    public SampleGridPagerAdapter(Context ctx, FragmentManager fm) {
+    public SampleGridPagerAdapter(Context ctx, FragmentManager fm, ShoppingList shoppingList) {
         super(fm);
         mContext = ctx;
-        shoppingList = new ShoppingList();
+        this.shoppingList = shoppingList;
     }
 
     @Override
     public Fragment getFragment(int row, int col) {
         String title = shoppingList.getName() + " item: ";
         String text;
-        if(shoppingList.getItems().size()!=0 || row > shoppingList.getItems().size()) {
-            text = shoppingList.getItems().get(row).getItemName();
+        CardFragment fragment;
+
+        if(shoppingList.getItems().size()==0 || row >= shoppingList.getItems().size()) {
+                text = "No items";
+                fragment = CardFragment.create(title, text, R.drawable.shopping_icon);
         }else{
-            text = "No items";
+            text = shoppingList.getItems().get(row).getItemName();
+            int imgid;
+            if(shoppingList.getItems().get(row).getImageId()==2130837539)
+                imgid = R.drawable.img_produce;
+            else if(shoppingList.getItems().get(row).getImageId()==2130837535)
+                imgid = R.drawable.img_dairy;
+            else if(shoppingList.getItems().get(row).getImageId()==2130837536)
+                imgid = R.drawable.img_grain;
+            else if(shoppingList.getItems().get(row).getImageId()==2130837537)
+                imgid = R.drawable.img_meat;
+            else if(shoppingList.getItems().get(row).getImageId()==2130837538)
+                imgid = R.drawable.img_other;
+            else if(shoppingList.getItems().get(row).getImageId()==2130837540)
+                imgid = R.drawable.img_snacks;
+            else
+                imgid = R.drawable.shopping_icon;
+
+            fragment = CardFragment.create(title, text, imgid);
+            Log.d(TAG, "img id = " + shoppingList.getItems().get(row).getImageId());
         }
-        CardFragment fragment = CardFragment.create(title, text, R.drawable.ic_launcher);
         fragment.setCardGravity(Gravity.BOTTOM);
-        fragment.setExpansionEnabled(true);
-        fragment.setExpansionDirection(CardFragment.EXPAND_UP);
+        //fragment.setExpansionEnabled(true);
+        //fragment.setExpansionDirection(CardFragment.EXPAND_UP);
         return fragment;
     }
 
     @Override
     public ImageReference getBackground(int row, int column) {
-        return ImageReference.forDrawable(R.drawable.ic_launcher);
+        return ImageReference.forDrawable(R.drawable.shopping_icon);
     }
 
     @Override
     public int getRowCount() {
         //make this higher than what we demo in class
         //other wise it breaks
-        return 2; //shoppingList.getItems().size()+1;
+        //return 10; //shoppingList.getItems().size()+1;
+        return  shoppingList.getItems().size()+1;
     }
 
     @Override

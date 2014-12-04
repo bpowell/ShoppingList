@@ -78,8 +78,7 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
                 return insets;
             }
         });
-        sampleGridPagerAdapter = new SampleGridPagerAdapter(getApplication(), getFragmentManager());
-        sampleGridPagerAdapter.shoppingList = shoppingList;
+        sampleGridPagerAdapter = new SampleGridPagerAdapter(getApplication(), getFragmentManager(), shoppingList);
         pager.setAdapter(sampleGridPagerAdapter);
 
         //yup
@@ -136,11 +135,12 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
                             dataMapItem.getDataMap().getIntegerArrayList("itemImageIds"),
                             dataMapItem.getDataMap().getIntegerArrayList("itemPurchased")
                             );
+
                     shoppingList = s;
-                    sampleGridPagerAdapter.shoppingList = shoppingList;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            sampleGridPagerAdapter = new SampleGridPagerAdapter(getApplication(), getFragmentManager(), shoppingList);
                             pager.setAdapter(sampleGridPagerAdapter);
                         }
                     });
