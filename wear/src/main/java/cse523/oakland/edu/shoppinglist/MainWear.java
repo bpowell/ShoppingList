@@ -64,7 +64,7 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
         Log.d(TAG, "start wear main");
 
         shoppingList = new ShoppingList();
-        shoppingList.setName("test name");
+        shoppingList.setName("Shopping List");
 
         pager = (GridViewPager) findViewById(R.id.pager);
         final Resources res = getResources();
