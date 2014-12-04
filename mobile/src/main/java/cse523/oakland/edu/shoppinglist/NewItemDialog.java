@@ -64,6 +64,7 @@ public class NewItemDialog extends DialogFragment {
                     shoppingList.addItem(newItem);
                     Activity mainList = getActivity();
                     ((Main) mainList).onShoppingListUpdate();
+                    ((Main) mainList).donotification();
                     ((Main) mainList).sendData("/data", shoppingList);
 
                                     }

@@ -124,8 +124,8 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.shopping_icon)
-                        .setContentTitle("Demo")
-                        .setContentText("It's demo of simple notification");
+                        .setContentTitle("Shopping List")
+                        .setContentText("A new item was added to your shopping list");
 
         // instance of the NotificationManager service
         NotificationManagerCompat notificationManager =

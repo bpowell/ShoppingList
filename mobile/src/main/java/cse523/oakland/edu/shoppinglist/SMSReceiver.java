@@ -55,6 +55,7 @@ public class SMSReceiver extends BroadcastReceiver {
         validMessage(msgString);
         Main mainActivity = (Main) context;
         mainActivity.onShoppingListUpdate();
+        mainActivity.donotification();
     }
 
     //Texts in form 1111:Category:Item
