@@ -2,9 +2,13 @@ package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -113,6 +117,24 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
         });
 
     }
+
+    public void donotification() {
+        int notificationId = 101;
+        //Building notification layout
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.shopping_icon)
+                        .setContentTitle("Demo")
+                        .setContentText("It's demo of simple notification");
+
+        // instance of the NotificationManager service
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(getApplicationContext());
+
+        // Build the notification and notify it using notification manager.
+        notificationManager.notify(notificationId, notificationBuilder.build());
+    }
+
     private void sendMessage( final String path, final String text ) {
         new Thread(new Runnable() {
             @Override
