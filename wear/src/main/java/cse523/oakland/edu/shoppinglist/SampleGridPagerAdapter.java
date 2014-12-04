@@ -37,7 +37,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
             fragment = CardFragment.create(title, text, imgid);
             Log.d(TAG, "img id = " + shoppingList.getItems().get(row).getImageId());
         }
-        fragment.setCardGravity(Gravity.NO_GRAVITY);
+        fragment.setCardGravity(Gravity.CENTER);
         //fragment.setExpansionEnabled(true);
         //fragment.setExpansionDirection(CardFragment.EXPAND_UP);
         return fragment;
