@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import com.google.android.gms.common.ConnectionResult;
@@ -219,7 +218,6 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "MSG REC" + messageEvent);
-        Toast.makeText(this, "WE GOT A MSG!!" + messageEvent, Toast.LENGTH_LONG).show();
 
         if (messageEvent.getPath().equals("/givemedata")) {
             sendData("/data", shoppingList);
@@ -250,7 +248,6 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
-        Toast.makeText(this, "we connected", Toast.LENGTH_LONG).show();
 
     }
 
