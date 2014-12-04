@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -22,7 +25,6 @@ public class Main extends Activity {
     private RecyclerView.LayoutManager mLayoutManager;
     Button addItemButton;
     FragmentManager fm = getFragmentManager();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +52,8 @@ public class Main extends Activity {
         test2.setImageId(R.drawable.img_meat_nt);
         shoppingList.addItem(test2);
 
-        mAdapter = new MyAdapter(shoppingList.getItems());
+        mAdapter = new MyAdapter(shoppingList.getItems(), this);
         mRecyclerView.setAdapter(mAdapter);
-
 
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,12 +1,18 @@
 package cse523.oakland.edu.shoppinglist;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,6 +22,9 @@ import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private ArrayList<ShoppingItem> mShoppingItems;
+    private Context mContext;
+    private ShoppingItem shoppingItem;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -30,8 +39,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(ArrayList<ShoppingItem> shoppingItems) {
+    public MyAdapter(ArrayList<ShoppingItem> shoppingItems, Context context) {
         mShoppingItems = shoppingItems;
+        mContext = context;
     }
 
     // Create new views (invoked by the layout manager)
@@ -54,17 +64,49 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - replace the contents of the view with that element
         TextView mTextView;
         ImageView mImageView;
+        CardView mCardView;
+        ImageView mTrash;
+        final int currentPosition = position;
+        shoppingItem = mShoppingItems.get(position);
 
         mTextView = (TextView) holder.mView.findViewById(R.id.itemName);
         mImageView = (ImageView) holder.mView.findViewById(R.id.itemImage);
-        mTextView.setText(mShoppingItems.get(position).getItemName());
-        mImageView.setImageResource(mShoppingItems.get(position).getImageId());
+        mCardView = (CardView) holder.mView.findViewById(R.id.cardView);
+        mTrash = (ImageView) holder.mView.findViewById(R.id.itemTrash);
+        mTextView.setText(shoppingItem.getItemName());
+        mImageView.setImageResource(shoppingItem.getImageId());
 
-        if (mShoppingItems.get(position).isPurchased() == 1) {
+        if (shoppingItem.isPurchased() == 1) {
             mImageView.setBackgroundColor(Color.parseColor("#EE30B77F"));
+            shoppingItem.setPurchased(1);
         } else {
             mImageView.setBackgroundColor(Color.parseColor("#EF9A9A"));
+            shoppingItem.setPurchased(0);
         }
+
+        //change color of background
+        mImageView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                ImageView thisImage = (ImageView) v;
+                if (shoppingItem.isPurchased() == 1) {
+                    thisImage.setBackgroundColor(Color.parseColor("#EF9A9A"));
+                    shoppingItem.setPurchased(0);
+                } else {
+                    thisImage.setBackgroundColor(Color.parseColor("#EE30B77F"));
+                    shoppingItem.setPurchased(1);
+                }
+        }
+        });
+
+        //dismiss card
+        mTrash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mShoppingItems.remove(currentPosition);
+                refreshShoppingList(mShoppingItems);
+            }
+        });
 
     }
 
@@ -78,4 +120,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         this.mShoppingItems = shoppingItems;
         this.notifyDataSetChanged();
     }
+
 }
