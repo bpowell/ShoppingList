@@ -25,16 +25,16 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
     public Fragment getFragment(int row, int col) {
         String title = shoppingList.getName() + " item: ";
         String text;
-        CardFragment fragment;
+        ClickFragment fragment;
 
         if(shoppingList.getItems().size()==0 || row >= shoppingList.getItems().size()) {
                 text = "No items";
-                fragment = CardFragment.create(title, text, R.drawable.shopping_icon);
+                fragment = (ClickFragment) CardFragment.create(title, text, R.drawable.shopping_icon);
         }else{
             text = shoppingList.getItems().get(row).getItemName();
             int imgid= R.drawable.shopping_icon;
 
-            fragment = CardFragment.create(title, text, imgid);
+            fragment = (ClickFragment) CardFragment.create(title, text, imgid);
             Log.d(TAG, "img id = " + shoppingList.getItems().get(row).getImageId());
         }
         fragment.setCardGravity(Gravity.CENTER);
