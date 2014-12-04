@@ -2,6 +2,7 @@ package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,16 +16,44 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.data.FreezableUtils;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi.DataItemResult;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi.SendMessageResult;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
+import java.util.Date;
 import java.util.logging.Logger;
 
 
-public class Main extends Activity {
+public class Main extends Activity implements DataApi.DataListener, MessageApi.MessageListener,
+        NodeApi.NodeListener, ConnectionCallbacks, OnConnectionFailedListener{
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     Button addItemButton;
     FragmentManager fm = getFragmentManager();
+    public static final String TAG = "=====";
+    public static final String PATH = "/shop";
+    public static final String START_ACTIVITY_PATH = "/start-activity";
+
+    private GoogleApiClient mGoogleApiClient;
+    ShoppingList shoppingList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +68,7 @@ public class Main extends Activity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ShoppingList shoppingList = ShoppingList.getAppData();
+        shoppingList = ShoppingList.getAppData();
 
         ShoppingItem test = new ShoppingItem();
         test.setItemName("Banana");
@@ -60,11 +89,76 @@ public class Main extends Activity {
             public void onClick(View v) {
                 NewItemDialog newItemDialog = new NewItemDialog();
                 newItemDialog.show(fm, "WOW");
+                sendData("/data", shoppingList);
             }
         });
 
         SMSReceiver receiver = new SMSReceiver(this);
         registerReceiver(receiver, SMSReceiver.filter);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
+
+        Button btn_open_wear_activity = (Button) findViewById(R.id.open);
+        btn_open_wear_activity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendMessage(START_ACTIVITY_PATH, "null");
+            }
+        });
+
+    }
+    private void sendMessage( final String path, final String text ) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                for (Node node : nodes.getNodes()) {
+                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+                            mGoogleApiClient, node.getId(), path, text.getBytes()).await();
+                }
+            }
+        }).start();
+    }
+
+    private void sendData(final String path, final ShoppingList sl){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH);
+                sl.putToDataMap(putDataMapRequest.getDataMap());
+                putDataMapRequest.getDataMap().putString("testing", "one two three");
+                putDataMapRequest.getDataMap().putLong("time", new Date().getTime());
+//                Log.d(TAG, putDataMapRequest.getDataMap().getString("listname"));
+                PutDataRequest request = putDataMapRequest.asPutDataRequest();
+
+                Log.d(TAG, "Generating DataItem: " + request);
+                if (!mGoogleApiClient.isConnected()) {
+                    return;
+                }
+                DataItemResult dataItemResult = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+                Log.d(TAG, "done: " + dataItemResult.getStatus());
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (null != mGoogleApiClient && !mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
     }
 
     @Override
@@ -89,12 +183,51 @@ public class Main extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     public void onShoppingListUpdate() {
         mAdapter.notifyDataSetChanged();
+    }
+
+
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        Log.d(TAG, "onDataChanged: " + dataEvents);
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.d(TAG, "MSG REC" + messageEvent);
+        Toast.makeText(this, "WE GOT A MSG!!" + messageEvent, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPeerConnected(Node node) {
+
+    }
+
+    @Override
+    public void onPeerDisconnected(Node node) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "Connection to Google API client has failed");
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
+        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        Wearable.NodeApi.removeListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "Google API Client was connected");
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Wearable.NodeApi.addListener(mGoogleApiClient, this);
+        Toast.makeText(this, "we connected", Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended");
     }
 }
