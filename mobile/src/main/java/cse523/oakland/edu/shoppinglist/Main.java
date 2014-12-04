@@ -74,17 +74,6 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
 
         shoppingList = ShoppingList.getAppData();
 
-        ShoppingItem test = new ShoppingItem();
-        test.setItemName("Banana");
-        test.setImageId(R.drawable.img_produce_nt);
-        test.setPurchased(1);
-        shoppingList.addItem(test);
-
-        ShoppingItem test2 = new ShoppingItem();
-        test2.setItemName("Steak");
-        test2.setImageId(R.drawable.img_meat_nt);
-        shoppingList.addItem(test2);
-
         mAdapter = new MyAdapter(shoppingList.getItems(), this);
         mRecyclerView.setAdapter(mAdapter);
 

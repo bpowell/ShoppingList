@@ -45,7 +45,7 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public ImageReference getBackground(int row, int column) {
-        return ImageReference.forDrawable(R.drawable.shopping_icon);
+        return ImageReference.forDrawable(R.drawable.green);
     }
 
     @Override
