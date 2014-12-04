@@ -1,12 +1,18 @@
 package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.database.DataSetObserver;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.wearable.view.GridViewPager;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowInsets;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,6 +26,7 @@ import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi.SendMessageResult;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.MessageApi;
@@ -29,29 +36,51 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import android.view.View.OnApplyWindowInsetsListener;
 
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class MainWear extends Activity implements ConnectionCallbacks, OnConnectionFailedListener,
         DataApi.DataListener, MessageApi.MessageListener, NodeApi.NodeListener {
 
     private TextView mTextView;
+    private GridViewPager pager;
     public static final String TAG = "WEARTHEREHERE";
 
     private GoogleApiClient mGoogleApiClient;
+    private SampleGridPagerAdapter sampleGridPagerAdapter;
+    private ShoppingList shoppingList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wear);
         Log.d(TAG, "start wear main");
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+
+        shoppingList = new ShoppingList();
+        shoppingList.setName("test name");
+
+        pager = (GridViewPager) findViewById(R.id.pager);
+        final Resources res = getResources();
+        pager.setOnApplyWindowInsetsListener(new OnApplyWindowInsetsListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mTextView = (TextView) stub.findViewById(R.id.text);
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                // Adjust page margins:
+                //   A little extra horizontal spacing between pages looks a bit
+                //   less crowded on a round display.
+                final boolean round = insets.isRound();
+                int rowMargin = res.getDimensionPixelOffset(R.dimen.page_row_margin);
+                int colMargin = res.getDimensionPixelOffset(round ?
+                        R.dimen.page_column_margin_round : R.dimen.page_column_margin);
+                pager.setPageMargins(rowMargin, colMargin);
+                return insets;
             }
         });
+        sampleGridPagerAdapter = new SampleGridPagerAdapter(getApplication(), getFragmentManager());
+        sampleGridPagerAdapter.shoppingList = shoppingList;
+        pager.setAdapter(sampleGridPagerAdapter);
 
         //yup
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -96,18 +125,30 @@ public class MainWear extends Activity implements ConnectionCallbacks, OnConnect
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
         dataEvents.close();
         for (DataEvent event : events) {
-            Uri uri = event.getDataItem().getUri();
-            String path = uri.getPath();
-            // Get the node id of the node that created the data item from the host portion of
-            // the uri.
-            String nodeId = uri.getHost();
-            // Set the data of the message to be the bytes of the Uri.
-            byte[] payload = uri.toString().getBytes();
-
-            // Send the rpc
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, "/ret", payload);
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                String path = event.getDataItem().getUri().getPath();
+                if ("/shop".equals(path)) {
+                    DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                    shoppingList.setName(dataMapItem.getDataMap().getString("listname"));
+                    ShoppingList s = new ShoppingList(
+                            dataMapItem.getDataMap().getString("listname"),
+                            dataMapItem.getDataMap().getStringArrayList("itemNames"),
+                            dataMapItem.getDataMap().getIntegerArrayList("itemImageIds"),
+                            dataMapItem.getDataMap().getIntegerArrayList("itemPurchased")
+                            );
+                    shoppingList = s;
+                    sampleGridPagerAdapter.shoppingList = shoppingList;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pager.setAdapter(sampleGridPagerAdapter);
+                        }
+                    });
+                } else {
+                    Log.d(TAG, "Unrecognized path: " + path);
+                }
+            }
         }
-
     }
 
     @Override

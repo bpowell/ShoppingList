@@ -85,6 +85,11 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
         i1.setImageId(1000);
         i1.setItemName("apples");
         a.addItem(i1);
+        ShoppingItem i2 = new ShoppingItem();
+        i2.setImageId(1001);
+        i2.setPurchased(1);
+        i2.setItemName("pears");
+        a.addItem(i2);
 
         ShoppingDataSource ds = new ShoppingDataSource(this);
         ds.open();
