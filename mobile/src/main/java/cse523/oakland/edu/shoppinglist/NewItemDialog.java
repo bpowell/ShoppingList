@@ -48,6 +48,9 @@ public class NewItemDialog extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 newItem.setImageId(imageResources[which]);
+                                if(which == -1) {
+                                    newItem.setImageId(imageResources[0]);
+                                }
                             }
                 })
                 .setPositiveButton("Add Item", new DialogInterface.OnClickListener() {
