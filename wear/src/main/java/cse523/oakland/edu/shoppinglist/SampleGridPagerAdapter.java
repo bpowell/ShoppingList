@@ -32,26 +32,12 @@ public class SampleGridPagerAdapter extends FragmentGridPagerAdapter {
                 fragment = CardFragment.create(title, text, R.drawable.shopping_icon);
         }else{
             text = shoppingList.getItems().get(row).getItemName();
-            int imgid;
-            if(shoppingList.getItems().get(row).getImageId()==2130837539)
-                imgid = R.drawable.img_produce;
-            else if(shoppingList.getItems().get(row).getImageId()==2130837535)
-                imgid = R.drawable.img_dairy;
-            else if(shoppingList.getItems().get(row).getImageId()==2130837536)
-                imgid = R.drawable.img_grain;
-            else if(shoppingList.getItems().get(row).getImageId()==2130837537)
-                imgid = R.drawable.img_meat;
-            else if(shoppingList.getItems().get(row).getImageId()==2130837538)
-                imgid = R.drawable.img_other;
-            else if(shoppingList.getItems().get(row).getImageId()==2130837540)
-                imgid = R.drawable.img_snacks;
-            else
-                imgid = R.drawable.shopping_icon;
+            int imgid= R.drawable.shopping_icon;
 
             fragment = CardFragment.create(title, text, imgid);
             Log.d(TAG, "img id = " + shoppingList.getItems().get(row).getImageId());
         }
-        fragment.setCardGravity(Gravity.BOTTOM);
+        fragment.setCardGravity(Gravity.NO_GRAVITY);
         //fragment.setExpansionEnabled(true);
         //fragment.setExpansionDirection(CardFragment.EXPAND_UP);
         return fragment;
