@@ -108,6 +108,7 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
             public void onClick(View view) {
                 sendMessage(START_ACTIVITY_PATH, "null");
                 sendData("/data", shoppingList);
+                onShoppingListUpdate();
             }
         });
 
