@@ -89,7 +89,6 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
             public void onClick(View v) {
                 NewItemDialog newItemDialog = new NewItemDialog();
                 newItemDialog.show(fm, "WOW");
-                sendData("/data", shoppingList);
             }
         });
 
@@ -124,7 +123,7 @@ public class Main extends Activity implements DataApi.DataListener, MessageApi.M
         }).start();
     }
 
-    private void sendData(final String path, final ShoppingList sl){
+    public void sendData(final String path, final ShoppingList sl){
         new Thread(new Runnable() {
             @Override
             public void run() {

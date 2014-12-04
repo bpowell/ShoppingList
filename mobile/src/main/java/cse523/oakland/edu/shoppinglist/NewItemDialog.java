@@ -61,7 +61,9 @@ public class NewItemDialog extends DialogFragment {
                     shoppingList.addItem(newItem);
                     Activity mainList = getActivity();
                     ((Main) mainList).onShoppingListUpdate();
-                }
+                    ((Main) mainList).sendData("/data", shoppingList);
+
+                                    }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
