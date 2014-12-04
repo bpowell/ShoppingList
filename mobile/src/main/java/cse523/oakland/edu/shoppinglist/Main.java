@@ -62,6 +62,9 @@ public class Main extends Activity {
                 newItemDialog.show(fm, "WOW");
             }
         });
+
+        SMSReceiver receiver = new SMSReceiver(this);
+        registerReceiver(receiver, SMSReceiver.filter);
     }
 
     @Override
