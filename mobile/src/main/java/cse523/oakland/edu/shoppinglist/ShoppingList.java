@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class ShoppingList {
     private int id;
-    private String name;
+    private String name = "Shopping List";
     private ArrayList<ShoppingItem> items;
     private static ShoppingList _shoppingList = null;
 
