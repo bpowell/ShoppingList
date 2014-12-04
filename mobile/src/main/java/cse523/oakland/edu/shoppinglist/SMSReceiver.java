@@ -1,6 +1,7 @@
 package cse523.oakland.edu.shoppinglist;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -52,6 +53,8 @@ public class SMSReceiver extends BroadcastReceiver {
         groceryTypes.add("other");
 
         validMessage(msgString);
+        Main mainActivity = (Main) context;
+        mainActivity.onShoppingListUpdate();
     }
 
     //Texts in form 1111:Category:Item
