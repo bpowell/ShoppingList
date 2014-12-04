@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_launcher"
+        android:src="@drawable/img_produce_nt"
         android:background="#ee30b77f" />
 
     <TextView
