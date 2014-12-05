@@ -30,3 +30,7 @@ proguard/
 
 # Log Files
 *.log
+.idea/*
+
+mobile/mobile.iml
+wear/wear.iml
