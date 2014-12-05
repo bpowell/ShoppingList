@@ -105,6 +105,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             public void onClick(View v) {
                 mShoppingItems.remove(currentPosition);
                 refreshShoppingList(mShoppingItems);
+                Main mainActivity = (Main) mContext;
+                ShoppingList shoppingList = ShoppingList.getAppData();
+                mainActivity.sendData("/data", shoppingList);
             }
         });
 
